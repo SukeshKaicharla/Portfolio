@@ -1,20 +1,16 @@
 # Use Tomcat as base
 FROM tomcat:9.0-jdk17
 
-# Set workdir to /app
 WORKDIR /app
 
-# Copy everything from repo into /app
+# Copy everything from repo (including dist)
 COPY . .
 
-# Remove default ROOT from Tomcat
+# Remove default ROOT
 RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
 
-# Copy dist/ into Tomcat ROOT
-COPY dist/ /usr/local/tomcat/webapps/ROOT/
+# Move dist into Tomcat ROOT
+RUN cp -r dist/* /usr/local/tomcat/webapps/ROOT/
 
-# Expose port
 EXPOSE 8080
-
-# Start Tomcat
 CMD ["catalina.sh", "run"]
