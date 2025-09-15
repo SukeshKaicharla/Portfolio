@@ -1,7 +1,6 @@
-# Use Node.js base image
-FROM node:18
+# Step 1: Build the React (Vite) app
+FROM node:18 AS build
 
-# Set working directory
 WORKDIR /app
 
 # Copy dependency files
@@ -10,17 +9,22 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy rest of the project
+# Copy project files
 COPY . .
 
-# Build the project
+# Build the project (creates /app/dist)
 RUN npm run build
 
-# Install a static file server
-RUN npm install -g serve
+# Step 2: Use Tomcat to serve static files
+FROM tomcat:9.0-jdk17
 
-# Expose port 3000
-EXPOSE 3000
+# Remove default ROOT app
+RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
 
-# Serve the build output
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Copy build output into Tomcat ROOT
+COPY --from=build /app/dist /usr/local/tomcat/webapps/ROOT/
+
+# Expose Tomcat port
+EXPOSE 8080
+
+CMD ["catalina.sh", "run"]
