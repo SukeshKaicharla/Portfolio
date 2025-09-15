@@ -37,7 +37,7 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f portfolio-cont || true
-                    docker run -itd --name portfolio-cont -p 9177:80 portfolio:latest
+                    docker run -itd --name portfolio-cont -p 9177:8080 portfolio:latest
                 '''
             }
         }
