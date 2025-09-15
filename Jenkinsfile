@@ -7,16 +7,6 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/SukeshKaicharla/Portfolio.git'
             }
         }
-
-        stage('Install & Build Project') {
-            steps {
-                sh '''
-                    npm install
-                    npm run build
-                '''
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh '''
