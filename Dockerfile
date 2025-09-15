@@ -1,16 +1,29 @@
-# Step 1: Use official Tomcat as base image
-FROM tomcat:9.0-jdk17-openjdk
+# Step 1: Build the React (Vite) app
+FROM node:18 AS build
 
-# Step 2: Remove default Tomcat applications (clean slate)
-RUN rm -rf /usr/local/tomcat/webapps/*
+# Set working directory inside container
+WORKDIR /app
 
-# Step 3: Copy your WAR file built by Maven into Tomcat
-# (your artifact is sukesh-devops-nexus.war)
-COPY target/sukesh-devops-nexus.war /usr/local/tomcat/webapps/ROOT.war
+# Copy package.json and lock file
+COPY package*.json ./
 
-# Step 4: Expose Tomcat port
-EXPOSE 8080
+# Install dependencies
+RUN npm install
 
-# Step 5: Start Tomcat when container runs
-CMD ["catalina.sh", "run"]
+# Copy all files
+COPY . .
 
+# Build the app (outputs to /app/dist)
+RUN npm run build
+
+# Step 2: Use Nginx to serve the built files
+FROM nginx:alpine
+
+# Copy build output to Nginx's default HTML folder
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose port 80 (Nginx default)
+EXPOSE 80
+
+# Run Nginx in foreground
+CMD ["nginx", "-g", "daemon off;"]
