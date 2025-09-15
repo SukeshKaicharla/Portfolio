@@ -1,31 +1,31 @@
-# Step 1: Build the React (Vite) app
-FROM node:18 AS build
+# Use Tomcat as base
+FROM tomcat:9.0-jdk17
 
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Install Node.js (for build)
+RUN apt-get update && \
+    apt-get install -y curl gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install dependencies including devDependencies
+# Copy package files and install dependencies
+COPY package*.json ./
 RUN npm install --include=dev
 
 # Copy rest of the app
 COPY . .
 
-# If you use environment variables, copy them
-# COPY .env .   # uncomment if needed
-
-# Build the app
+# Build the React (Vite) app
 RUN npm run build
 
-# Step 2: Use Tomcat to serve static files
-FROM tomcat:9.0-jdk17
-
-# Remove default ROOT app
+# Remove default ROOT in Tomcat
 RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
 
-# Copy build output into Tomcat ROOT
-COPY --from=build /app/dist /usr/local/tomcat/webapps/ROOT/
+# Copy build output to Tomcat ROOT
+RUN cp -r /app/dist/* /usr/local/tomcat/webapps/ROOT/
 
 # Expose Tomcat port
 EXPOSE 8080
