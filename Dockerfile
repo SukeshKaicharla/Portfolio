@@ -1,14 +1,17 @@
+# Use Tomcat base image
 FROM tomcat:9.0-jdk17
 
 # Set working directory inside container
-WORKDIR /app
+WORKDIR /usr/local/tomcat/webapps
 
-# Copy dist from build context into /app
-COPY dist ./dist
+# Remove default ROOT app
+RUN rm -rf ROOT/*
 
-# Clear Tomcat ROOT and copy files
-RUN rm -rf /usr/local/tomcat/webapps/ROOT/* \
-    && cp -r ./dist/* /usr/local/tomcat/webapps/ROOT/
+# Copy built dist folder directly into ROOT
+COPY dist/ ROOT/
 
+# Expose Tomcat port
 EXPOSE 8080
+
+# Start Tomcat
 CMD ["catalina.sh", "run"]
