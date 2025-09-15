@@ -1,27 +1,27 @@
-# Use Tomcat as base
+# Use Tomcat base image
 FROM tomcat:9.0-jdk17
 
-# Set working directory
-WORKDIR /app
-
-# Install Node.js (for build)
+# Install Node.js and build tools
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
+    apt-get install -y curl gnupg build-essential python3 && \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy package files and install dependencies
+# Set working directory
+WORKDIR /app
+
+# Copy package files and install dependencies including devDependencies
 COPY package*.json ./
 RUN npm install --include=dev
 
-# Copy rest of the app
+# Copy the rest of the project
 COPY . .
 
-# Build the React (Vite) app
+# Build the Vite React app
 RUN npm run build
 
-# Remove default ROOT in Tomcat
+# Remove default Tomcat ROOT app
 RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
 
 # Copy build output to Tomcat ROOT
