@@ -1,29 +1,28 @@
 # Step 1: Build the React (Vite) app
 FROM node:18 AS build
 
-# Set working directory inside container
 WORKDIR /app
 
-# Copy package.json and lock file
+# Copy dependency files first (better caching)
 COPY package*.json ./
+COPY bun.lockb .  # if you use bun
 
-# Install dependencies
+# Install all dependencies (including dev)
 RUN npm install
 
-# Copy all files
+# Copy rest of the code
 COPY . .
 
-# Build the app (outputs to /app/dist)
+# Build project
 RUN npm run build
 
-# Step 2: Use Nginx to serve the built files
+# Step 2: Serve with Nginx
 FROM nginx:alpine
 
-# Copy build output to Nginx's default HTML folder
+# Copy build output
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose port 80 (Nginx default)
+# Expose port 80
 EXPOSE 80
 
-# Run Nginx in foreground
 CMD ["nginx", "-g", "daemon off;"]
