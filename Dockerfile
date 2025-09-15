@@ -1,15 +1,15 @@
 FROM tomcat:9.0-jdk17
 
-# Set workspace
 WORKDIR /app
 
-# Copy everything from your repo into container
+# Copy your project files
 COPY . /app
 
-# Remove default Tomcat ROOT
-RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
+# Remove default ROOT (whether it's a folder or ROOT.war)
+RUN rm -rf /usr/local/tomcat/webapps/ROOT \
+    && mkdir -p /usr/local/tomcat/webapps/ROOT
 
-# Copy static files directly into ROOT
+# Copy your static files into ROOT
 RUN cp -r /app/* /usr/local/tomcat/webapps/ROOT/
 
 EXPOSE 8080
