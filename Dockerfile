@@ -1,11 +1,16 @@
 FROM tomcat:9.0-jdk17
 
-WORKDIR /usr/local/tomcat/webapps
+# Create a workspace inside container
+WORKDIR /app
 
-RUN rm -rf ROOT/*
+# Copy everything from repo into container /app
+COPY . /app
 
-# Copy the dist folder from the Portfolio directory inside Jenkins workspace
-COPY Portfolio/dist/ ROOT/
+# Clean default Tomcat ROOT
+RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
+
+# Copy built React app from /app/dist into ROOT
+RUN cp -r /app/dist/* /usr/local/tomcat/webapps/ROOT/
 
 EXPOSE 8080
 
