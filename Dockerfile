@@ -3,13 +3,13 @@ FROM node:18 AS build
 
 WORKDIR /app
 
-# Copy dependency files
+# Copy package.json and lock file first for caching
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy project files
+# Copy rest of the project
 COPY . .
 
 # Build the project (creates /app/dist)
@@ -27,4 +27,5 @@ COPY --from=build /app/dist /usr/local/tomcat/webapps/ROOT/
 # Expose Tomcat port
 EXPOSE 8080
 
+# Start Tomcat
 CMD ["catalina.sh", "run"]
