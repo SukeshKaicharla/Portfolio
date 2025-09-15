@@ -4,7 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig({
-  base: "/Portfolio/",  // repo name (case-sensitive!)
+  base: "/Portfolio/",
   plugins: [react()],
   resolve: {
     alias: {
@@ -12,6 +12,7 @@ export default defineConfig({
     },
   },
 });
+
 
   plugins: [
     react(),
