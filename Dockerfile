@@ -1,16 +1,16 @@
 FROM tomcat:9.0-jdk17
 
-# Create a workspace inside container
+# Set workspace
 WORKDIR /app
 
-# Copy everything from repo into container /app
+# Copy everything from your repo into container
 COPY . /app
 
-# Clean default Tomcat ROOT
+# Remove default Tomcat ROOT
 RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
 
-# Copy built React app from /app/dist into ROOT
-RUN cp -r /app/dist/* /usr/local/tomcat/webapps/ROOT/
+# Copy static files directly into ROOT
+RUN cp -r /app/* /usr/local/tomcat/webapps/ROOT/
 
 EXPOSE 8080
 
