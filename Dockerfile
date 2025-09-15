@@ -3,16 +3,19 @@ FROM node:18 AS build
 
 WORKDIR /app
 
-# Copy package.json and lock file first for caching
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies including devDependencies
+RUN npm install --include=dev
 
-# Copy rest of the project
+# Copy rest of the app
 COPY . .
 
-# Build the project (creates /app/dist)
+# If you use environment variables, copy them
+# COPY .env .   # uncomment if needed
+
+# Build the app
 RUN npm run build
 
 # Step 2: Use Tomcat to serve static files
