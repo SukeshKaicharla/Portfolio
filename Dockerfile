@@ -1,13 +1,26 @@
-# Dockerfile (production)
-FROM node:18 AS build
+# Use Node.js base image
+FROM node:18
+
+# Set working directory
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+
+# Copy dependency files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy rest of the project
 COPY . .
+
+# Build the project
 RUN npm run build
 
-FROM nginx:alpine
-RUN rm -rf /usr/share/nginx/html/*
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Install a static file server
+RUN npm install -g serve
+
+# Expose port 3000
+EXPOSE 3000
+
+# Serve the build output
+CMD ["serve", "-s", "dist", "-l", "3000"]
