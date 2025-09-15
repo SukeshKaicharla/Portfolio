@@ -7,6 +7,16 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/SukeshKaicharla/Portfolio.git'
             }
         }
+
+        stage('Build React App') {
+            steps {
+                sh '''
+                    npm install --legacy-peer-deps
+                    npm run build
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh '''
