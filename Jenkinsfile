@@ -7,6 +7,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/SukeshKaicharla/Portfolio.git'
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 sh '''
@@ -41,14 +42,27 @@ pipeline {
                 '''
             }
         }
+
+        stage('Set kubeconfig (AWS EKS)') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
+                    sh '''
+                        aws eks update-kubeconfig --name k8scluster --region ap-south-1
+                        kubectl get nodes
+                    '''
+                }
+            }
+        }
+
         stage('Deploy to Kubernetes') {
-   	 steps {
-        sh '''
-            kubectl apply -f k8s/deployment.yml
-            kubectl apply -f k8s/ingress.yml
-        '''
-   	 }
-	}
+            steps {
+                sh '''
+                    kubectl apply -f k8s/deployment.yml
+                    kubectl apply -f k8s/ingress.yml
+                '''
+            }
+        }
 
     }
 }
+
